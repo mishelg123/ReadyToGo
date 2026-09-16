@@ -123,6 +123,13 @@ function App() {
           </div>
         </section>
 
+        <section className="mischel-card" aria-label="ברכה ממישל">
+          <img src="/mishel.jpg" alt="מישל" />
+          <div>
+            <h3>נוצר במיוחד ממישל לפזפזולי</h3>
+          </div>
+        </section>
+
         <label className="search-box" htmlFor="search-service">
           <span>⌕</span>
           <input

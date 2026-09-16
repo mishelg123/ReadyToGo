@@ -125,6 +125,45 @@
   font-size: 0.76rem;
 }
 
+.mischel-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 22px;
+  background: linear-gradient(135deg, #fffdf8, #fff3e8);
+  box-shadow: 0 12px 24px rgba(92, 70, 44, 0.08);
+  transform: rotate(-0.6deg);
+}
+
+.mischel-card img {
+  width: 116px;
+  height: 116px;
+  flex: 0 0 116px;
+  object-fit: cover;
+  border-radius: 18px;
+  border: 3px solid #fff;
+  box-shadow: 0 8px 16px rgba(92, 70, 44, 0.14);
+}
+
+.mischel-kicker {
+  display: block;
+  margin-bottom: 4px;
+  color: #c27452;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.mischel-card h3 {
+  margin: 0;
+  color: #51382f;
+  font-size: 1.15rem;
+  line-height: 1.35;
+}
+
 .search-box {
   display: flex;
   align-items: center;
