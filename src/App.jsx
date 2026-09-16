@@ -66,10 +66,12 @@ function App() {
   const [selectedCategory, setSelectedCategory] = useState('כולם')
   const [selectedBusiness, setSelectedBusiness] = useState(businesses[0])
   const [search, setSearch] = useState('')
+  const [selectedTime, setSelectedTime] = useState('')
+  const [sortBy, setSortBy] = useState('recommended')
   const [booked, setBooked] = useState(false)
 
   const filteredBusinesses = useMemo(() => {
-    return businesses.filter((business) => {
+    const matchingBusinesses = businesses.filter((business) => {
       const matchesCategory =
         selectedCategory === 'כולם' || business.category === selectedCategory
       const matchesSearch =
@@ -79,10 +81,37 @@ function App() {
 
       return matchesCategory && matchesSearch
     })
-  }, [search, selectedCategory])
+
+    return [...matchingBusinesses].sort((firstBusiness, secondBusiness) => {
+      if (sortBy === 'distance') {
+        return parseFloat(firstBusiness.distance) - parseFloat(secondBusiness.distance)
+      }
+
+      if (sortBy === 'rating') {
+        return secondBusiness.rating - firstBusiness.rating
+      }
+
+      if (sortBy === 'price') {
+        return (
+          parseInt(firstBusiness.price.replace(/\D/g, ''), 10) -
+          parseInt(secondBusiness.price.replace(/\D/g, ''), 10)
+        )
+      }
+
+      return firstBusiness.id - secondBusiness.id
+    })
+  }, [search, selectedCategory, sortBy])
+
+  const handleBusinessSelect = (business) => {
+    setSelectedBusiness(business)
+    setSelectedTime('')
+    setBooked(false)
+  }
 
   const handleBook = () => {
-    setBooked(true)
+    if (selectedTime) {
+      setBooked(true)
+    }
   }
 
   return (
@@ -159,10 +188,45 @@ function App() {
             <p className="eyebrow">מומלץ</p>
             <h3>זמינים עכשיו</h3>
           </div>
-          <button type="button" className="link-btn">
-            סינון
+          <button
+            type="button"
+            className={sortBy !== 'recommended' ? 'link-btn active' : 'link-btn'}
+            onClick={() => setSortBy(sortBy === 'recommended' ? 'distance' : 'recommended')}
+          >
+            {sortBy === 'distance' ? 'הכי קרוב' : 'סינון'}
           </button>
         </section>
+
+        <div className="sort-options" aria-label="אפשרויות מיון">
+          <button
+            type="button"
+            className={sortBy === 'recommended' ? 'sort-option active' : 'sort-option'}
+            onClick={() => setSortBy('recommended')}
+          >
+            מומלץ
+          </button>
+          <button
+            type="button"
+            className={sortBy === 'distance' ? 'sort-option active' : 'sort-option'}
+            onClick={() => setSortBy('distance')}
+          >
+            הכי קרוב
+          </button>
+          <button
+            type="button"
+            className={sortBy === 'rating' ? 'sort-option active' : 'sort-option'}
+            onClick={() => setSortBy('rating')}
+          >
+            דירוג גבוה
+          </button>
+          <button
+            type="button"
+            className={sortBy === 'price' ? 'sort-option active' : 'sort-option'}
+            onClick={() => setSortBy('price')}
+          >
+            מחיר נמוך
+          </button>
+        </div>
 
         <section className="cards-grid">
           {filteredBusinesses.map((business) => (
@@ -171,7 +235,7 @@ function App() {
               className={
                 selectedBusiness.id === business.id ? 'service-card selected' : 'service-card'
               }
-              onClick={() => setSelectedBusiness(business)}
+              onClick={() => handleBusinessSelect(business)}
             >
               <div className="card-top">
                 <div className="service-icon" style={{ background: business.color }}>
@@ -218,7 +282,15 @@ function App() {
 
           <div className="time-row">
             {selectedBusiness.available.map((slot) => (
-              <button key={slot} type="button" className="time-slot">
+              <button
+                key={slot}
+                type="button"
+                className={selectedTime === slot ? 'time-slot selected' : 'time-slot'}
+                onClick={() => {
+                  setSelectedTime(slot)
+                  setBooked(false)
+                }}
+              >
                 {slot}
               </button>
             ))}
@@ -231,13 +303,30 @@ function App() {
             </div>
             <div>
               <span>זמינות</span>
-              <strong>{selectedBusiness.available.length} שיבוצים</strong>
+              <strong>{selectedTime || 'בחר שעה'}</strong>
             </div>
           </div>
 
-          <button type="button" className="reserve-btn" onClick={handleBook}>
-            {booked ? 'הזמנה נשמרה' : 'שמור מקום עכשיו'}
-          </button>
+          {booked ? (
+            <div className="booking-success" role="status">
+              <span className="success-icon">✓</span>
+              <div>
+                <strong>ההזמנה נשמרה בהצלחה</strong>
+                <span>
+                  {selectedBusiness.name} · היום בשעה {selectedTime}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              className="reserve-btn"
+              onClick={handleBook}
+              disabled={!selectedTime}
+            >
+              {selectedTime ? `אישור הזמנה ל-${selectedTime}` : 'בחר שעה כדי להמשיך'}
+            </button>
+          )}
         </section>
       </main>
     </div>
